@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { object, string } from "yup";
+
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
@@ -18,11 +20,44 @@ interface PersonalDetailsProps {
   onNextStep: () => void;
 }
 
+const personalDataSchema = object({
+  fullName: string()
+    .required("Name is required")
+    .min(3, "Name must be at least 3 characters"),
+  age: string()
+    .required("DOB or Age is required")
+    .matches(/^[1-9]\d*$/, "Age must be a positive integer"),
+  sex: string().required("Sex is required"),
+  mobileNo: string().matches(/^\d{10}$/, "Mobile No must be a 10-digit number"),
+  govtIdType: string(),
+  govtId: string(),
+});
+
 const PersonalDetails: React.FC<PersonalDetailsProps> = ({
   personalData,
   onPersonalDataChange,
   onNextStep,
 }) => {
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const handleNextStep = () => {
+    personalDataSchema
+      .validate(personalData, { abortEarly: false })
+      .then(() => {
+        // Proceed to the next step
+        onNextStep();
+      })
+      .catch((errors) => {
+        // console.error(errors.errors);
+        const newErrors: { [key: string]: string } = {};
+
+        errors.inner.forEach((error: { path: any; message: string }) => {
+          newErrors[error.path!] = error.message;
+        });
+
+        setFormErrors(newErrors);
+      });
+  };
+
   return (
     <div className="flex justify-center items-center flex-col gap-4">
       <div className="flex justify-start items-center w-full">
@@ -38,6 +73,8 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           onChange={onPersonalDataChange}
           fullWidth
           margin="normal"
+          error={!!formErrors["fullName"]}
+          helperText={formErrors["fullName"]}
         />
         <TextField
           label="DOB or Age*"
@@ -46,6 +83,8 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           onChange={onPersonalDataChange}
           fullWidth
           margin="normal"
+          error={!!formErrors["age"]}
+          helperText={formErrors["age"]}
         />
         <TextField
           label="Sex"
@@ -55,6 +94,8 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           select
           fullWidth
           margin="normal"
+          error={!!formErrors["sex"]}
+          helperText={formErrors["sex"]}
         >
           <MenuItem value="male">Male</MenuItem>
           <MenuItem value="female">Female</MenuItem>
@@ -66,6 +107,8 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           onChange={onPersonalDataChange}
           fullWidth
           margin="normal"
+          error={!!formErrors["mobileNo"]}
+          helperText={formErrors["mobileNo"]}
         />
         <TextField
           label="Govt Issued ID Type"
@@ -86,10 +129,12 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           onChange={onPersonalDataChange}
           fullWidth
           margin="normal"
+          error={!!formErrors["govtId"]}
+          helperText={formErrors["govtId"]}
         />
       </section>
       <div className="flex justify-end items-center w-full">
-        <Button variant="contained" color="primary" onClick={onNextStep}>
+        <Button variant="contained" color="primary" onClick={handleNextStep}>
           Next
         </Button>
       </div>
