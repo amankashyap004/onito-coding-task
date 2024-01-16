@@ -4,7 +4,7 @@ function App() {
   return (
     <main>
       <div>
-        <p>React Js Project</p>
+        <p className="text-xl font-bold">React Js Project</p>
       </div>
     </main>
   );
