@@ -1,15 +1,11 @@
-import Button from "@mui/material/Button";
-
+import TwoStepForm from "./components/TwoStepForm";
 import "./App.css";
 
 function App() {
   return (
     <main>
       <div>
-        <p className="text-xl font-bold">React Js Project</p>
-      </div>
-      <div>
-        <Button variant="contained">Contained</Button>
+        <TwoStepForm />
       </div>
     </main>
   );
