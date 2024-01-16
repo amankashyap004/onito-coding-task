@@ -4,6 +4,11 @@ import AddressDetails from "./AddressDetails";
 
 interface PersonalData {
   fullName: string;
+  age: string;
+  sex: string;
+  mobileNo: string;
+  govtIdType: string;
+  govtId: string;
 }
 
 interface AddressData {
@@ -15,6 +20,11 @@ const TwoStepForm: React.FC = () => {
 
   const [personalData, setPersonalData] = useState<PersonalData>({
     fullName: "",
+    age: "",
+    sex: "",
+    mobileNo: "",
+    govtIdType: "",
+    govtId: "",
   });
 
   const [addressData, setAddressData] = useState<AddressData>({
