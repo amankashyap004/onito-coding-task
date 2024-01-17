@@ -13,6 +13,10 @@ interface PersonalData {
 
 interface AddressData {
   address: string;
+  state: string;
+  city: string;
+  country: string;
+  pinCode: string;
 }
 
 const TwoStepForm: React.FC = () => {
@@ -29,6 +33,10 @@ const TwoStepForm: React.FC = () => {
 
   const [addressData, setAddressData] = useState<AddressData>({
     address: "",
+    state: "",
+    city: "",
+    country: "",
+    pinCode: "",
   });
 
   const handleNextStep = () => {
