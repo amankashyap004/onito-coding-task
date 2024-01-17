@@ -71,7 +71,7 @@ const personalDataSchema = object({
 const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNextStep }) => {
   const [personalData, setPersonalData] =
     useState<PersonalData>(initialPersonalData);
-    
+
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
   const handlePersonalDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,6 +80,12 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNextStep }) => {
       ...prevData,
       [name]: value,
     }));
+
+    setFormErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      delete newErrors[name];
+      return newErrors;
+    });
   };
 
   const handleNextStep = () => {
@@ -88,6 +94,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNextStep }) => {
       .then(() => {
         // Proceed to the next step
         onNextStep();
+        setPersonalData(initialPersonalData);
       })
       .catch((errors) => {
         const newErrors: { [key: string]: string } = {};

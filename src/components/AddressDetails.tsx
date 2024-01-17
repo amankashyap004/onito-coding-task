@@ -44,17 +44,42 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({ onPrevStep }) => {
 
   const handleAddressDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    // Validate and update pin code with only numeric values
+    if (name === "pinCode" && !/^\d*$/.test(value)) {
+      return;
+    }
+
     setAddressData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+
+    setFormErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      delete newErrors[name];
+      return newErrors;
+    });
   };
 
-  const handleNextStep = () => {
+  const handleCountryChange = (_: any, value: string | null) => {
+    setAddressData((prevData) => ({
+      ...prevData,
+      country: value || "",
+    }));
+    setFormErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      delete newErrors["country"];
+      return newErrors;
+    });
+  };
+
+  const handleSubmit = () => {
     addressSchema
       .validate(addressData, { abortEarly: false })
       .then(() => {
         // onSubmit();
+        printFormData();
+        setAddressData(initialAddressData);
         setFormErrors({});
       })
       .catch((errors) => {
@@ -85,6 +110,10 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({ onPrevStep }) => {
 
     fetchCountrySuggestions();
   }, []);
+
+  const printFormData = () => {
+    console.log(addressData);
+  };
 
   return (
     <div className="flex justify-center items-center flex-col gap-4">
@@ -124,15 +153,15 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({ onPrevStep }) => {
               label="Country"
               name="country"
               value={addressData.country}
-              onChange={handleAddressDataChange}
+              onChange={(e: any) => handleAddressDataChange(e)}
               fullWidth
               margin="normal"
               error={!!formErrors["country"]}
               helperText={formErrors["country"]}
             />
           )}
+          onChange={handleCountryChange}
         />
-
         <TextField
           label="Pin Code"
           name="pinCode"
@@ -148,7 +177,7 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({ onPrevStep }) => {
         <Button variant="contained" onClick={onPrevStep}>
           Previous
         </Button>
-        <Button variant="contained" onClick={handleNextStep}>
+        <Button variant="contained" onClick={handleSubmit}>
           Submit
         </Button>
       </div>
