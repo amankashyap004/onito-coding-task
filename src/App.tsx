@@ -1,12 +1,15 @@
+import { Provider } from "react-redux";
+import { store } from "./store";
+
 import TwoStepForm from "./components/TwoStepForm";
 import "./App.css";
 
 function App() {
   return (
     <main>
-      <div>
+      <Provider store={store}>
         <TwoStepForm />
-      </div>
+      </Provider>
     </main>
   );
 }

@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { object, string } from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { setPersonalDetailsData } from "../store/actions/actions";
+import { getPersonalDetailsData } from "../store/selectors/selectors";
 
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -69,6 +72,8 @@ const personalDataSchema = object({
 });
 
 const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNextStep }) => {
+  const dispatch = useDispatch();
+
   const [personalData, setPersonalData] =
     useState<PersonalData>(initialPersonalData);
 
@@ -95,6 +100,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNextStep }) => {
         // Proceed to the next step
         onNextStep();
         setPersonalData(initialPersonalData);
+        printFormData();
       })
       .catch((errors) => {
         const newErrors: { [key: string]: string } = {};
@@ -106,6 +112,17 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNextStep }) => {
         setFormErrors(newErrors);
       });
   };
+
+  const data = useSelector(getPersonalDetailsData);
+
+  const printFormData = () => {
+    console.log(personalData);
+    console.log(data);
+  };
+
+  useEffect(() => {
+    dispatch(setPersonalDetailsData(personalData));
+  }, [dispatch, personalData]);
 
   return (
     <div className="flex justify-center items-center flex-col gap-4">
