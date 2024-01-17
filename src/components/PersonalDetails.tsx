@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { object, string } from "yup";
-import { useDispatch, useSelector } from "react-redux";
-import { setPersonalDetailsData } from "../store/actions/actions";
-import { getPersonalDetailsData } from "../store/selectors/selectors";
-
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
+
+import { useDispatch, useSelector } from "react-redux";
+import { setPersonalDetailsData } from "../store/actions/actions";
+import { getPersonalDetailsData } from "../store/selectors/selectors";
 
 interface PersonalData {
   fullName: string;
@@ -113,11 +113,11 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNextStep }) => {
       });
   };
 
-  const data = useSelector(getPersonalDetailsData);
+  // const updatedPersonalData = useSelector(getPersonalDetailsData);
 
   const printFormData = () => {
-    console.log(personalData);
-    console.log(data);
+    // console.log(personalData);
+    // console.log(updatedPersonalData);
   };
 
   useEffect(() => {

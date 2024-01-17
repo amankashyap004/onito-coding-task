@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { object, string } from "yup";
-
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
+
+import { useDispatch, useSelector } from "react-redux";
+import { setAddressDetailsData } from "../store/actions/actions";
+import {
+  getPersonalDetailsData,
+  getAddressDetailsData,
+} from "../store/selectors/selectors";
 
 interface AddressData {
   address: string;
@@ -37,6 +43,8 @@ const addressSchema = object({
 });
 
 const AddressDetails: React.FC<AddressDetailsProps> = ({ onPrevStep }) => {
+  const dispatch = useDispatch();
+
   const [addressData, setAddressData] =
     useState<AddressData>(initialAddressData);
 
@@ -111,9 +119,18 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({ onPrevStep }) => {
     fetchCountrySuggestions();
   }, []);
 
+  const updatedPersonalData = useSelector(getPersonalDetailsData);
+  const updatedAddressData = useSelector(getAddressDetailsData);
+
   const printFormData = () => {
     console.log(addressData);
+    console.log(updatedPersonalData);
+    console.log(updatedAddressData);
   };
+
+  useEffect(() => {
+    dispatch(setAddressDetailsData(addressData));
+  }, [dispatch, addressData]);
 
   return (
     <div className="flex justify-center items-center flex-col gap-4">
