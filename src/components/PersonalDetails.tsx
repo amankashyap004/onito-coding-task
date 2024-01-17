@@ -29,8 +29,36 @@ const personalDataSchema = object({
     .matches(/^[1-9]\d*$/, "Age must be a positive integer"),
   sex: string().required("Sex is required"),
   mobileNo: string().matches(/^\d{10}$/, "Mobile No must be a 10-digit number"),
-  govtIdType: string(),
-  govtId: string(),
+  govtIdType: string().required("Govt ID Type is required"),
+  govtId: string().test(
+    "govtIdValidation",
+    "Govt ID is required",
+    function (value: any, context) {
+      const govtIdType = context.parent.govtIdType;
+
+      if (!govtIdType) {
+        return true;
+      }
+
+      if (govtIdType === "aadhar") {
+        if (!/^[2-9][0-9]{11}$/.test(value)) {
+          return this.createError({
+            path: "govtId",
+            message:
+              "Aadhar should have 12 numeric digits and should not start with 0 and 1",
+          });
+        }
+      } else if (govtIdType === "pan") {
+        if (!/^[a-zA-Z0-9]{10}$/.test(value)) {
+          return this.createError({
+            path: "govtId",
+            message: "PAN should be a ten-character long alpha-numeric string",
+          });
+        }
+      }
+      return true;
+    }
+  ),
 });
 
 const PersonalDetails: React.FC<PersonalDetailsProps> = ({
@@ -118,20 +146,24 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           select
           fullWidth
           margin="normal"
+          error={!!formErrors["govtIdType"]}
+          helperText={formErrors["govtIdType"]}
         >
           <MenuItem value="aadhar">Aadhar</MenuItem>
           <MenuItem value="pan">PAN</MenuItem>
         </TextField>
-        <TextField
-          label="Govt Issued ID"
-          name="govtId"
-          value={personalData.govtId}
-          onChange={onPersonalDataChange}
-          fullWidth
-          margin="normal"
-          error={!!formErrors["govtId"]}
-          helperText={formErrors["govtId"]}
-        />
+        {personalData.govtIdType && (
+          <TextField
+            label="Govt Issued ID"
+            name="govtId"
+            value={personalData.govtId}
+            onChange={onPersonalDataChange}
+            fullWidth
+            margin="normal"
+            error={!!formErrors["govtId"]}
+            helperText={formErrors["govtId"]}
+          />
+        )}
       </section>
       <div className="flex justify-end items-center w-full">
         <Button variant="contained" color="primary" onClick={handleNextStep}>
