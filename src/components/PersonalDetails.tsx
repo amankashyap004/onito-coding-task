@@ -14,9 +14,16 @@ interface PersonalData {
   govtId: string;
 }
 
+const initialPersonalData: PersonalData = {
+  fullName: "",
+  age: "",
+  sex: "",
+  mobileNo: "",
+  govtIdType: "",
+  govtId: "",
+};
+
 interface PersonalDetailsProps {
-  personalData: PersonalData;
-  onPersonalDataChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onNextStep: () => void;
 }
 
@@ -61,12 +68,20 @@ const personalDataSchema = object({
   ),
 });
 
-const PersonalDetails: React.FC<PersonalDetailsProps> = ({
-  personalData,
-  onPersonalDataChange,
-  onNextStep,
-}) => {
+const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNextStep }) => {
+  const [personalData, setPersonalData] =
+    useState<PersonalData>(initialPersonalData);
+    
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+
+  const handlePersonalDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPersonalData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   const handleNextStep = () => {
     personalDataSchema
       .validate(personalData, { abortEarly: false })
@@ -75,7 +90,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
         onNextStep();
       })
       .catch((errors) => {
-        // console.error(errors.errors);
         const newErrors: { [key: string]: string } = {};
 
         errors.inner.forEach((error: { path: any; message: string }) => {
@@ -98,7 +112,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           label="Name*"
           name="fullName"
           value={personalData.fullName}
-          onChange={onPersonalDataChange}
+          onChange={handlePersonalDataChange}
           fullWidth
           margin="normal"
           error={!!formErrors["fullName"]}
@@ -108,7 +122,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           label="DOB or Age*"
           name="age"
           value={personalData.age}
-          onChange={onPersonalDataChange}
+          onChange={handlePersonalDataChange}
           fullWidth
           margin="normal"
           error={!!formErrors["age"]}
@@ -118,7 +132,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           label="Sex"
           name="sex"
           value={personalData.sex}
-          onChange={onPersonalDataChange}
+          onChange={handlePersonalDataChange}
           select
           fullWidth
           margin="normal"
@@ -132,7 +146,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           label="Mobile No"
           name="mobileNo"
           value={personalData.mobileNo}
-          onChange={onPersonalDataChange}
+          onChange={handlePersonalDataChange}
           fullWidth
           margin="normal"
           error={!!formErrors["mobileNo"]}
@@ -142,7 +156,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           label="Govt Issued ID Type"
           name="govtIdType"
           value={personalData.govtIdType}
-          onChange={onPersonalDataChange}
+          onChange={handlePersonalDataChange}
           select
           fullWidth
           margin="normal"
@@ -157,7 +171,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
             label="Govt Issued ID"
             name="govtId"
             value={personalData.govtId}
-            onChange={onPersonalDataChange}
+            onChange={handlePersonalDataChange}
             fullWidth
             margin="normal"
             error={!!formErrors["govtId"]}

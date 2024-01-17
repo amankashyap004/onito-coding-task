@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { object, string } from "yup";
 
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import Autocomplete from "@mui/material/Autocomplete";
 
 interface AddressData {
   address: string;
@@ -12,11 +13,17 @@ interface AddressData {
   pinCode: string;
 }
 
+const initialAddressData: AddressData = {
+  address: "",
+  state: "",
+  city: "",
+  country: "",
+  pinCode: "",
+};
+
 interface AddressDetailsProps {
-  addressData: AddressData;
-  onAddressDataChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPrevStep: () => void;
-  onSubmit: () => void;
+  // onSubmit: () => void;
 }
 
 const addressSchema = object({
@@ -29,18 +36,26 @@ const addressSchema = object({
     .matches(/^\d+$/, "Pin Code must be numeric"),
 });
 
-const AddressDetails: React.FC<AddressDetailsProps> = ({
-  addressData,
-  onAddressDataChange,
-  onPrevStep,
-  onSubmit,
-}) => {
+const AddressDetails: React.FC<AddressDetailsProps> = ({ onPrevStep }) => {
+  const [addressData, setAddressData] =
+    useState<AddressData>(initialAddressData);
+
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+
+  const handleAddressDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setAddressData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   const handleNextStep = () => {
     addressSchema
       .validate(addressData, { abortEarly: false })
       .then(() => {
-        onSubmit();
+        // onSubmit();
+        setFormErrors({});
       })
       .catch((errors) => {
         const newErrors: { [key: string]: string } = {};
@@ -53,6 +68,24 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
       });
   };
 
+  const [countrySuggestions, setCountrySuggestions] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchCountrySuggestions = async () => {
+      try {
+        const response = await fetch("https://restcountries.com/v3.1/all");
+        const countries = await response.json();
+        setCountrySuggestions(
+          countries.map((country: any) => country.name.common)
+        );
+      } catch (error) {
+        console.error("Error fetching country suggestions:", error);
+      }
+    };
+
+    fetchCountrySuggestions();
+  }, []);
+
   return (
     <div className="flex justify-center items-center flex-col gap-4">
       <div className="flex justify-start items-center w-full">
@@ -63,7 +96,7 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
           label="Address"
           name="address"
           value={addressData.address}
-          onChange={onAddressDataChange}
+          onChange={handleAddressDataChange}
           fullWidth
           margin="normal"
         />
@@ -71,7 +104,7 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
           label="State"
           name="state"
           value={addressData.state}
-          onChange={onAddressDataChange}
+          onChange={handleAddressDataChange}
           fullWidth
           margin="normal"
         />
@@ -79,25 +112,32 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
           label="City"
           name="city"
           value={addressData.city}
-          onChange={onAddressDataChange}
+          onChange={handleAddressDataChange}
           fullWidth
           margin="normal"
         />
-        <TextField
-          label="Country"
-          name="country"
-          value={addressData.country}
-          onChange={onAddressDataChange}
-          fullWidth
-          margin="normal"
-          error={!!formErrors["country"]}
-          helperText={formErrors["country"]}
+        <Autocomplete
+          options={countrySuggestions}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Country"
+              name="country"
+              value={addressData.country}
+              onChange={handleAddressDataChange}
+              fullWidth
+              margin="normal"
+              error={!!formErrors["country"]}
+              helperText={formErrors["country"]}
+            />
+          )}
         />
+
         <TextField
-          label="PinCode"
+          label="Pin Code"
           name="pinCode"
           value={addressData.pinCode}
-          onChange={onAddressDataChange}
+          onChange={handleAddressDataChange}
           fullWidth
           margin="normal"
           error={!!formErrors["pinCode"]}
