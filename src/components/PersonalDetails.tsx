@@ -4,9 +4,8 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setPersonalDetailsData } from "../store/actions/actions";
-import { getPersonalDetailsData } from "../store/selectors/selectors";
 
 interface PersonalData {
   fullName: string;
@@ -100,7 +99,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNextStep }) => {
         // Proceed to the next step
         onNextStep();
         setPersonalData(initialPersonalData);
-        printFormData();
       })
       .catch((errors) => {
         const newErrors: { [key: string]: string } = {};
@@ -111,13 +109,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNextStep }) => {
 
         setFormErrors(newErrors);
       });
-  };
-
-  // const updatedPersonalData = useSelector(getPersonalDetailsData);
-
-  const printFormData = () => {
-    // console.log(personalData);
-    // console.log(updatedPersonalData);
   };
 
   useEffect(() => {

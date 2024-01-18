@@ -4,12 +4,8 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setAddressDetailsData } from "../store/actions/actions";
-import {
-  getPersonalDetailsData,
-  getAddressDetailsData,
-} from "../store/selectors/selectors";
 
 interface AddressData {
   address: string;
@@ -29,7 +25,7 @@ const initialAddressData: AddressData = {
 
 interface AddressDetailsProps {
   onPrevStep: () => void;
-  // onSubmit: () => void;
+  onFormCompletion: () => void;
 }
 
 const addressSchema = object({
@@ -42,13 +38,17 @@ const addressSchema = object({
     .matches(/^\d+$/, "Pin Code must be numeric"),
 });
 
-const AddressDetails: React.FC<AddressDetailsProps> = ({ onPrevStep }) => {
+const AddressDetails: React.FC<AddressDetailsProps> = ({
+  onPrevStep,
+  onFormCompletion,
+}) => {
   const dispatch = useDispatch();
 
   const [addressData, setAddressData] =
     useState<AddressData>(initialAddressData);
 
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const [countrySuggestions, setCountrySuggestions] = useState<string[]>([]);
 
   const handleAddressDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -85,10 +85,9 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({ onPrevStep }) => {
     addressSchema
       .validate(addressData, { abortEarly: false })
       .then(() => {
-        // onSubmit();
-        printFormData();
         setAddressData(initialAddressData);
         setFormErrors({});
+        onFormCompletion();
       })
       .catch((errors) => {
         const newErrors: { [key: string]: string } = {};
@@ -100,8 +99,6 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({ onPrevStep }) => {
         setFormErrors(newErrors);
       });
   };
-
-  const [countrySuggestions, setCountrySuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchCountrySuggestions = async () => {
@@ -119,18 +116,9 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({ onPrevStep }) => {
     fetchCountrySuggestions();
   }, []);
 
-  const updatedPersonalData = useSelector(getPersonalDetailsData);
-  const updatedAddressData = useSelector(getAddressDetailsData);
-
-  const printFormData = () => {
-    console.log(addressData);
-    console.log(updatedPersonalData);
-    console.log(updatedAddressData);
-  };
-
   useEffect(() => {
     dispatch(setAddressDetailsData(addressData));
-  }, [dispatch, addressData]);
+  }, [addressData]);
 
   return (
     <div className="flex justify-center items-center flex-col gap-4">
