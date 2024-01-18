@@ -80,6 +80,14 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNextStep }) => {
 
   const handlePersonalDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    if (
+      name === "mobileNo" &&
+      (!/^\d{0,10}$/.test(value) || value.length > 10)
+    ) {
+      return;
+    }
+
     setPersonalData((prevData) => ({
       ...prevData,
       [name]: value,

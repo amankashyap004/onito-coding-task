@@ -26,6 +26,7 @@ const initialAddressData: AddressData = {
 interface AddressDetailsProps {
   onPrevStep: () => void;
   onFormCompletion: () => void;
+  isFormCompleted: any;
 }
 
 const addressSchema = object({
@@ -35,12 +36,13 @@ const addressSchema = object({
   country: string().required("Country is required"),
   pinCode: string()
     .required("Pin Code is required")
-    .matches(/^\d+$/, "Pin Code must be numeric"),
+    .matches(/^\d{6}$/, "Pin Code must be a 6-digit numeric"),
 });
 
 const AddressDetails: React.FC<AddressDetailsProps> = ({
   onPrevStep,
   onFormCompletion,
+  isFormCompleted,
 }) => {
   const dispatch = useDispatch();
 
@@ -52,8 +54,9 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
 
   const handleAddressDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    // Validate and update pin code with only numeric values
-    if (name === "pinCode" && !/^\d*$/.test(value)) {
+
+    // Validate and update pin code with only 6-digit numeric values
+    if (name === "pinCode" && (!/^\d{0,6}$/.test(value) || value.length > 6)) {
       return;
     }
 
@@ -120,6 +123,16 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
     dispatch(setAddressDetailsData(addressData));
   }, [dispatch, addressData]);
 
+  useEffect(() => {
+    // Reset the country value after form submission
+    if (isFormCompleted) {
+      setAddressData((prevData) => ({
+        ...prevData,
+        country: "",
+      }));
+    }
+  }, [isFormCompleted]);
+
   return (
     <div className="flex justify-center items-center flex-col gap-4 w-full">
       <div className="flex justify-start items-center w-full">
@@ -166,6 +179,7 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
             />
           )}
           onChange={handleCountryChange}
+          value={isFormCompleted ? "" : addressData.country}
         />
         <TextField
           label="Pin Code"
