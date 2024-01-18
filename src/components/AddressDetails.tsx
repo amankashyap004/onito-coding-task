@@ -85,9 +85,9 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
     addressSchema
       .validate(addressData, { abortEarly: false })
       .then(() => {
-        setAddressData(initialAddressData);
         setFormErrors({});
         onFormCompletion();
+        setAddressData(initialAddressData);
       })
       .catch((errors) => {
         const newErrors: { [key: string]: string } = {};
@@ -118,10 +118,10 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
 
   useEffect(() => {
     dispatch(setAddressDetailsData(addressData));
-  }, [addressData]);
+  }, [dispatch, addressData]);
 
   return (
-    <div className="flex justify-center items-center flex-col gap-4">
+    <div className="flex justify-center items-center flex-col gap-4 w-full">
       <div className="flex justify-start items-center w-full">
         <p className="text-sm md:text-lg font-medium">Step 2: Address</p>
       </div>

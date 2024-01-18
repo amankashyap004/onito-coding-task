@@ -116,7 +116,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNextStep }) => {
   }, [dispatch, personalData]);
 
   return (
-    <div className="flex justify-center items-center flex-col gap-4">
+    <div className="flex justify-center items-center flex-col gap-4 w-full">
       <div className="flex justify-start items-center w-full">
         <p className="text-base md:text-lg font-medium">
           Step 1: Personal Details
