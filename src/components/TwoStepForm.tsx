@@ -58,7 +58,6 @@ const TwoStepForm: React.FC = () => {
           <AddressDetails
             onPrevStep={handlePrevStep}
             onFormCompletion={handleFormCompletion}
-            isFormCompleted={isFormCompleted}
           />
         )}
       </div>

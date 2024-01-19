@@ -26,7 +26,6 @@ const initialAddressData: AddressData = {
 interface AddressDetailsProps {
   onPrevStep: () => void;
   onFormCompletion: () => void;
-  isFormCompleted: any;
 }
 
 const addressSchema = object({
@@ -42,7 +41,6 @@ const addressSchema = object({
 const AddressDetails: React.FC<AddressDetailsProps> = ({
   onPrevStep,
   onFormCompletion,
-  isFormCompleted,
 }) => {
   const dispatch = useDispatch();
 
@@ -51,6 +49,7 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
 
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [countrySuggestions, setCountrySuggestions] = useState<string[]>([]);
+  const [submitTrigger, setSubmitTrigger] = useState(false);
 
   const handleAddressDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -91,6 +90,7 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
         setFormErrors({});
         onFormCompletion();
         setAddressData(initialAddressData);
+        setSubmitTrigger(true);
       })
       .catch((errors) => {
         const newErrors: { [key: string]: string } = {};
@@ -124,14 +124,14 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
   }, [dispatch, addressData]);
 
   useEffect(() => {
-    // Reset the country value after form submission
-    if (isFormCompleted) {
+    if (submitTrigger) {
       setAddressData((prevData) => ({
         ...prevData,
         country: "",
       }));
+      setSubmitTrigger(false);
     }
-  }, [isFormCompleted]);
+  }, [submitTrigger]);
 
   return (
     <div className="flex justify-center items-center flex-col gap-4 w-full">
@@ -165,6 +165,8 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
         />
         <Autocomplete
           options={countrySuggestions}
+          getOptionLabel={(option) => option}
+          isOptionEqualToValue={(option, value) => option === value}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -179,7 +181,8 @@ const AddressDetails: React.FC<AddressDetailsProps> = ({
             />
           )}
           onChange={handleCountryChange}
-          value={isFormCompleted ? "" : addressData.country}
+          // value={submitTrigger ? "" : addressData.country}
+          value={addressData.country}
         />
         <TextField
           label="Pin Code"
